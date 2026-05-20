@@ -1,0 +1,31 @@
+{
+  "name": "kojiro-ai-assistant",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@ai-sdk/groq": "^3.0.39",
+    "ai": "^6.0.185",
+    "better-sqlite3": "^12.10.0",
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "^0.45.2",
+    "grammy": "^1.43.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^25.9.0",
+    "drizzle-kit": "^0.31.10",
+    "tsx": "^4.22.2",
+    "typescript": "^6.0.3"
+  }
+}
