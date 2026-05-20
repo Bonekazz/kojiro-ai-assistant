@@ -12,6 +12,7 @@ import { db } from "./db/db.js";
 import { categories, transactions } from "./db/schema.js";
 import { eq } from "drizzle-orm";
 import { systemPrompt } from "./lib/agent/agent.js";
+import { usersWhitelistMiddleware } from "./lib/bot/middlewares/whitelist.js";
 
 const TG_BOT_TOKEN=process.env.TG_BOT_TOKEN;
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
@@ -30,6 +31,9 @@ const groq = createGroq({
 
 // O grammY infere os tipos automaticamente
 const bot = new Bot(TG_BOT_TOKEN);
+
+// middlewares
+bot.use(usersWhitelistMiddleware);
 
 // Comando /start
 bot.command("start", async (ctx: Context) => {
@@ -65,7 +69,7 @@ bot.on("message:text", async (ctx: Context) => {
 
   await ctx.reply(text, {
     parse_mode: 'Markdown',
-    reply_markup: inlineKeyboard, // Adiciona os botões aqui
+    // reply_markup: inlineKeyboard, // Adiciona os botões aqui
   });
 });
 
