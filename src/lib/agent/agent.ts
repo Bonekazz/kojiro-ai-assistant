@@ -1,9 +1,9 @@
-import { isLoopFinished, stepCountIs, tool } from "ai"
 import z from "zod"
-import { getWalletBalance } from "@/lib/finance/wallet/queries.js"
+import { getWalletBalance } from "@/lib/finance/wallet/queries"
 import { createGroq } from "@ai-sdk/groq";
 import { registerTransaction } from "../finance/transactions/queries";
 import { registerTransactionInputSchema } from "../finance/transactions/schemas";
+import { isLoopFinished, stepCountIs, tool } from "ai";
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 if (!GROQ_API_KEY) {
@@ -24,7 +24,7 @@ export const system =`
 `
 
 export const tools = { 
-  getWalletBallance: tool({
+  getWalletBalance: tool({
     description: "Captura o saldo atual na carteira do usuário",
     inputSchema: z.object({}),
     execute: async () => getWalletBalance(),
@@ -32,7 +32,7 @@ export const tools = {
   registerTransaction: tool({
     description: "Registra uma transação do usuário, do tipo in (ganho) ou out (gasto).",
     inputSchema: registerTransactionInputSchema,
-    execute: async (rawInput: unknown) => registerTransaction(rawInput),
+    execute: async (input) => (await registerTransaction(input)),
   })
 }
 
@@ -40,5 +40,5 @@ export const modelConfig = {
   model: groq("llama-3.3-70b-versatile"),
   system,
   tools,
-  stopWhen: [isLoopFinished(), stepCountIs(10)],
+  stopWhen: [isLoopFinished(), stepCountIs(5)]
 }

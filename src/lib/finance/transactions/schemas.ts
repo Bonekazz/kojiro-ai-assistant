@@ -1,5 +1,12 @@
 import { z } from "zod";
 
+export const transactionItemSchema = z.object({
+  amount: z.number().positive(),
+  description: z.string().min(1),
+  type: z.enum(["expense", "income"]), // ajuste conforme seu enum
+  categoryId: z.number().int().positive(),
+});
+
 export const registerTransactionInputSchema = z.object({
   description: z
     .string()
@@ -14,19 +21,9 @@ export const registerTransactionInputSchema = z.object({
     .enum(["in", "out"])
     .describe("O tipo da transação: 'in' para entradas/ganhos, 'out' para saídas/gastos"),
   
-  categoryId: z
-    .number()
-    .int()
-    .optional()
-    .nullable()
-    .describe("O ID numérico da categoria correspondente"),
-  
-  groceryTripId: z
-    .number()
-    .int()
-    .optional()
-    .nullable()
-    .describe("O ID numérico da viagem ao mercado (opcional, use apenas se fizer parte de uma compra de mercado)"),
+  category: z
+    .string()
+    .describe("Nome da categoria correspondente"),
 });
 
 export type RegisterTransactionInput = z.infer<typeof registerTransactionInputSchema>;

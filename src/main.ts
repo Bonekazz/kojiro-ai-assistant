@@ -37,7 +37,7 @@ bot.on("message:text", async (ctx: Context) => {
   //   .text('📊 Ver Extrato', 'view_report')
 
   const { text, toolResults } = await generateText({
-    prompt: textInput,
+    messages: [{role: "user", content: textInput }],
     ...(modelConfig)
   });
 

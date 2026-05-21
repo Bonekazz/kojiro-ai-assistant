@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id           Int           @id @default(autoincrement())
+  name         String        @unique
+  createdAt    DateTime      @default(now())
+
+  transactions Transaction[]
+}
+
+model Transaction {
+  id            Int       @id @default(autoincrement())
+  description   String
+  amount        Float
+  type          String    // "expense" ou "income"
+  categoryId    Int
+
+  createdAt     DateTime  @default(now())
+
+  category      Category  @relation(fields: [categoryId], references: [id])
+}

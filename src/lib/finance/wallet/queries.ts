@@ -1,20 +1,14 @@
-import { sql } from 'drizzle-orm';
-import { transactions } from '@/db/schema';
+import { prisma } from "@/lib/prisma";
 
+export async function getWalletBalance(): Promise<number> {
+  const agg = await prisma.transaction.groupBy({
+    by: ["type"],
+    _sum: { amount: true }
+  });
 
-import { db } from '@/db/db';
+  const totalIn = agg.find(item => item.type === 'in')?._sum.amount || 0;
+  const totalOut = agg.find(item => item.type === 'out')?._sum.amount || 0;
 
-export function getWalletBalance(): number {
-  // Soma todas as entradas ('in') e subtrai todas as saídas ('out')
-  const result = db
-    .select({
-      totalIn: sql<number>`SUM(CASE WHEN type = 'in' THEN amount ELSE 0 END)`,
-      totalOut: sql<number>`SUM(CASE WHEN type = 'out' THEN amount ELSE 0 END)`,
-    })
-    .from(transactions)
-    .get();
-
-  const balance = (result?.totalIn || 0) - (result?.totalOut || 0);
-  return balance;
+  return totalIn - totalOut;
 }
 

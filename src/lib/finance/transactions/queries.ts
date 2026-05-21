@@ -1,52 +1,43 @@
-import { db } from "@/db/db";
-import { transactions } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { prisma } from "@/lib/prisma";
 import { registerTransactionInputSchema } from "./schemas";
 
-export async function registerTransaction(rawInput: unknown) {
+export async function registerTransaction(rawInput: unknown): Promise<{
+  sucess?: boolean,
+  data?: any,
+  errors?: any
+}>{
 
-  const parsedInput = registerTransactionInputSchema.parse(rawInput);
+  try { 
+    const validInput = registerTransactionInputSchema.safeParse(rawInput);
+    if (!validInput.success) throw new Error(`(!) Error - Invalid input: ${validInput.error.message}`);
 
-  const { amount, description, type, categoryId, groceryTripId } = parsedInput;
+    const input = validInput.data!;
+    const newTransaction = await prisma.transaction.create({
+      data: {
+        ...input,
+        category: { 
+          connectOrCreate: { 
+            where: { name: input.category },
+            create: { name: input.category}
+          }
+        }
+      },
+      include: { category: true }
+    });
 
-  try {
 
-    const [inserted] = await db
-      .insert(transactions)
-      .values({
-        description,
-        amount,
-        type,
-        categoryId,
-        groceryTripId: groceryTripId ?? null
-      })
-      .returning({insertedId: transactions.id})
-
-      if (!inserted) throw new Error("Error on inserting transaction.");
-
-      // Retorna a transação com os dados da categoria acoplados automaticamente
-      const fullTransaction = await db
-        .select({})
-        .from(transactions)
-        .where(eq(transactions.id, inserted.insertedId))
-
-      const result = {
-        success: true,
-        message: "Transação registrada com sucesso!",
-        data: fullTransaction,
-      };
-
-      console.log("> RESULT: ", result);
-      return result;
-
-  } catch (error) {
     return {
-      success: false,
-      message: error instanceof Error ? error.message : "Erro desconhecido.",
-    };
+      sucess: true,
+      data: newTransaction
+    }
+  
+  } catch (error: any) {
+    return {
+      sucess: false,
+      errors: error
+    }
   }
 }
-
 
 export function editTransaction () {}
 export function deleteTransaction () {}
