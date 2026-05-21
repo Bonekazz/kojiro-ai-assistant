@@ -1,15 +1,20 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler", /* Permite omitir extensões (.js) de forma segura */
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "types": ["node"],
     "rootDir": "./src",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "paths": {
+      "@/*": ["./src/*"] // Mapeia o arroba para a pasta onde fica seu código
+    },
+    "allowSyntheticDefaultImports": true,
   },
-  "include": ["src/**/*"]
+  "include": ["./src/**/*"],
+  "exclude": ["./node_modules", "./dist"]
 }

@@ -1,33 +1,16 @@
-import { Bot, Context, InlineKeyboard } from "grammy";
+import { Bot, Context } from "grammy";
 import "dotenv/config";
 
-import { generateText, isLoopFinished, stepCountIs, tool } from "ai";
-import { createGroq } from '@ai-sdk/groq';
-import {
-  getWalletBalance,
-} from "./lib/finance/queries/wallet.js";
+import { generateText } from "ai";
 
-import { z } from "zod";
-import { db } from "./db/db.js";
-import { categories, transactions } from "./db/schema.js";
-import { eq } from "drizzle-orm";
-import { systemPrompt } from "./lib/agent/agent.js";
-import { usersWhitelistMiddleware } from "./lib/bot/middlewares/whitelist.js";
+import { modelConfig } from "@/lib/agent/agent";
+import { usersWhitelistMiddleware } from "@/lib/bot/middlewares/whitelist";
 
 const TG_BOT_TOKEN=process.env.TG_BOT_TOKEN;
-const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 if (!TG_BOT_TOKEN) {
   throw new Error("O token do bot não foi definido no arquivo .env");
 }
-
-if (!GROQ_API_KEY) {
-  throw new Error("Groq api key not defined in .env");
-}
-
-const groq = createGroq({
-  apiKey: GROQ_API_KEY,
-});
 
 // O grammY infere os tipos automaticamente
 const bot = new Bot(TG_BOT_TOKEN);
@@ -50,24 +33,17 @@ bot.on("message:text", async (ctx: Context) => {
 
   await ctx.reply(`Você digitou: ${textInput}`);
 
-  const inlineKeyboard = new InlineKeyboard()
-    .text('📊 Ver Extrato', 'view_report')
+  // const inlineKeyboard = new InlineKeyboard()
+  //   .text('📊 Ver Extrato', 'view_report')
 
-  const { text } = await generateText({
-    model: groq("llama-3.3-70b-versatile"),
-    system: systemPrompt,
+  const { text, toolResults } = await generateText({
     prompt: textInput,
-    stopWhen: [isLoopFinished(), stepCountIs(10)],
-    tools: {
-      getWalletBallance: tool({
-        description: "Captura o saldo atual na carteira do usuário",
-        inputSchema: z.object({}),
-        execute: async () => getWalletBalance(),
-      }),
-    },
-  })
+    ...(modelConfig)
+  });
 
-  await ctx.reply(text, {
+  const resposta = toolResults?.[0]?.output ?? text;
+
+  await ctx.reply(resposta as any || "Processado com sucesso!", {
     parse_mode: 'Markdown',
     // reply_markup: inlineKeyboard, // Adiciona os botões aqui
   });

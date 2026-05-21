@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, uniqueIndex, real } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
 
 const createdAt = text("created_at").default("CURRENT_TIMESTAMP").notNull()
 
@@ -24,7 +24,6 @@ export const transactions = sqliteTable("transactions", {
   type: text("type").$type<"in" | "out">().notNull() ,
 
   categoryId: integer("category_id")
-    .notNull()
     .references(() => categories.id, { onDelete: "cascade"}),
 
   groceryTripId: integer("grocery_trip_id").references(() => groceryTrips.id, { onDelete: "cascade"}),
