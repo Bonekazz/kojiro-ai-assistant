@@ -31,8 +31,6 @@ bot.on("message:text", async (ctx: Context) => {
     return await ctx.reply("Desculpe, não consegui entender sua mensagem.");
   }
 
-  await ctx.reply(`Você digitou: ${textInput}`);
-
   // const inlineKeyboard = new InlineKeyboard()
   //   .text('📊 Ver Extrato', 'view_report')
 

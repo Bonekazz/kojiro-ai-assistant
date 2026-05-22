@@ -2,8 +2,7 @@ import { prismaMock } from "@/lib/prisma/mock";
 import { registerTransaction } from "./queries";
 
 describe("Test Suit: Register Transaction", () => {
-
-  it("Must register a transaction (success case)", async () => {
+  it("Must register a transaction and return success.", async () => {
     const mockCategory = { id: 1, name: "Lanche", createdAt: new Date()};
     const mockTransaction = { 
       id: 1, 
@@ -27,4 +26,7 @@ describe("Test Suit: Register Transaction", () => {
     expect(newTransaction.data).toEqual(mockTransaction);
     expect(prismaMock.transaction.create).toHaveBeenCalledTimes(1);
   })
+
+  // it("Must reject and return validation error if invalid input.")
+  // it("Must return failure if prisma return an error.")
 });
