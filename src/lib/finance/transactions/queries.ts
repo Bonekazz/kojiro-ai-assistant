@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { registerTransactionInputSchema } from "./schemas";
+import { RegisterTransactionInput, registerTransactionInputSchema } from "./schemas";
+import z from "zod";
 
 export async function registerTransaction(rawInput: unknown): Promise<{
   sucess?: boolean,
@@ -8,27 +9,28 @@ export async function registerTransaction(rawInput: unknown): Promise<{
 }>{
 
   try { 
-    const validInput = registerTransactionInputSchema.safeParse(rawInput);
+    const validInput = z.array(registerTransactionInputSchema).safeParse(rawInput);
     if (!validInput.success) throw new Error(`(!) Error - Invalid input: ${validInput.error.message}`);
 
     const input = validInput.data!;
-    const newTransaction = await prisma.transaction.create({
-      data: {
-        ...input,
-        category: { 
-          connectOrCreate: { 
-            where: { name: input.category },
-            create: { name: input.category}
+    const createdTransactions = await prisma.$transaction(input.map((x: RegisterTransactionInput, i: number) => 
+      prisma.transaction.create({
+        data: {
+          ...x,
+          category: { 
+            connectOrCreate: { 
+              where: { name: x.category },
+              create: { name: x.category}
+            }
           }
-        }
-      },
-      include: { category: true }
-    });
-
+        },
+        include: { category: true }
+      })
+    ))
 
     return {
       sucess: true,
-      data: newTransaction
+      data: createdTransactions
     }
   
   } catch (error: any) {

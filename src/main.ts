@@ -1,11 +1,13 @@
 import { Bot, Context } from "grammy";
 import "dotenv/config";
 
-import { generateText } from "ai";
+import { generateText, Output } from "ai";
 
 import { modelConfig } from "@/lib/agent/agent";
 import { usersWhitelistMiddleware } from "@/lib/bot/middlewares/whitelist";
 import { getWalletBalance } from "./lib/finance/wallet/queries";
+import { registerTransactionInputSchema } from "./lib/finance/transactions/schemas";
+import { registerTransaction } from "./lib/finance/transactions/queries";
 
 const TG_BOT_TOKEN=process.env.TG_BOT_TOKEN;
 
@@ -32,17 +34,20 @@ bot.on("message:text", async (ctx: Context) => {
     return await ctx.reply("Desculpe, não consegui entender sua mensagem.");
   }
 
-  // const inlineKeyboard = new InlineKeyboard()
-  //   .text('📊 Ver Extrato', 'view_report')
-
-  const { text, toolResults } = await generateText({
-    messages: [{role: "user", content: textInput }],
+  const { output } = await generateText({
+    prompt: textInput,
+    output: Output.array({
+      element: registerTransactionInputSchema
+    }),
     ...(modelConfig)
   });
 
-  const resposta = toolResults?.[0]?.output ?? text;
+  // console.log("> OUTPUT: ", output);
 
-  await ctx.reply(resposta as any || "Processado com sucesso!", {
+  const result = await registerTransaction(output);
+
+  await ctx.reply((result.sucess && `Precessado com sucesso. Saldo atual: R$ ${(await getWalletBalance()).toFixed(2)}`) 
+  || "Erro ao processar operação" , {
     parse_mode: 'Markdown',
     // reply_markup: inlineKeyboard, // Adiciona os botões aqui
   });
