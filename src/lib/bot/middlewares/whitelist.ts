@@ -7,8 +7,6 @@ const USERS_WHITELIST: number[] = usersWhitelistRaw
 // Whitelist middleware
 export function usersWhitelistMiddleware(ctx: any, next: any) {
   const userId = ctx.from?.id;
-  console.log("> FROM: ", userId);
-  console.log("> WHITELIST: ", USERS_WHITELIST);
 
   if (userId && USERS_WHITELIST.includes(userId)) {
     ctx.reply('❌ Acesso negado. Você não tem permissão para usar este bot.');

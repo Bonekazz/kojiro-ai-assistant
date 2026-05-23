@@ -16,6 +16,5 @@ describe("Test Suit: Get Wallet Balance.", () => {
       by: ["type"],
       _sum: { amount: true }
     })
-
   })
 });

@@ -5,6 +5,7 @@ import { generateText } from "ai";
 
 import { modelConfig } from "@/lib/agent/agent";
 import { usersWhitelistMiddleware } from "@/lib/bot/middlewares/whitelist";
+import { getWalletBalance } from "./lib/finance/wallet/queries";
 
 const TG_BOT_TOKEN=process.env.TG_BOT_TOKEN;
 
@@ -19,8 +20,8 @@ const bot = new Bot(TG_BOT_TOKEN);
 bot.use(usersWhitelistMiddleware);
 
 // Comando /start
-bot.command("start", async (ctx: Context) => {
-  await ctx.reply("Olá! Agora sou um bot moderno rodando puramente em TypeScript!");
+bot.command("balance", async (ctx: Context) => {
+  await ctx.reply(`Balance: R$ ${(await getWalletBalance()).toFixed(2).replace(".", ",")}`);
 });
 
 // Ouvindo mensagens de texto
