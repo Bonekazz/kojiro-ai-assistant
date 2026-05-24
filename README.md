@@ -114,3 +114,5 @@ O bot tentará extrair o valor e registrar a transação automaticamente.
 ---
 
 Pronto para usar: o bot transforma anotações manuais em entradas financeiras automáticas com suporte a IA e persistência local.
+
+*Este README foi gerado com ajuda de IA.*
