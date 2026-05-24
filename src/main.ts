@@ -44,10 +44,14 @@ bot.on("message:text", async (ctx: Context) => {
 
   // console.log("> OUTPUT: ", output);
 
-  const result = await registerTransaction(output);
+  const balance = (await getWalletBalance()).toFixed(2);
+  const result = output.length > 0 ? await registerTransaction(output) : undefined;
 
-  await ctx.reply((result.sucess && `Precessado com sucesso. Saldo atual: R$ ${(await getWalletBalance()).toFixed(2)}`) 
-  || "Erro ao processar operação" , {
+  let response;
+  if (result) response = result.sucess ? `Precessado com sucesso. Saldo atual: R$ ${balance}` : "Erro ao processar operação";
+  if (!result) response = `Nada para processar. Saldo atual: R$ ${balance}`;
+
+  await ctx.reply( response!, {
     parse_mode: 'Markdown',
     // reply_markup: inlineKeyboard, // Adiciona os botões aqui
   });
