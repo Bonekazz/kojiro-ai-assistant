@@ -44,8 +44,8 @@ bot.on("message:text", async (ctx: Context) => {
 
   // console.log("> OUTPUT: ", output);
 
-  const balance = (await getWalletBalance()).toFixed(2);
   const result = output.length > 0 ? await registerTransaction(output) : undefined;
+  const balance = (await getWalletBalance()).toFixed(2);
 
   let response;
   if (result) response = result.sucess ? `Precessado com sucesso. Saldo atual: R$ ${balance}` : "Erro ao processar operação";

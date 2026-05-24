@@ -1,8 +1,15 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
-if (!GOOGLE_API_KEY) {
-  throw new Error("GOOGLE api key not defined in .env");
+
+const googleConfig = { 
+  GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
+  GOOGLE_API_MODEL: process.env.GOOGLE_API_MODEL,
+}
+
+const { GOOGLE_API_KEY, GOOGLE_API_MODEL } = googleConfig;
+
+if (!GOOGLE_API_KEY || !GOOGLE_API_MODEL ) {
+  throw new Error(`Google variables wrongly configured: ${JSON.stringify(googleConfig, null, 2)}`);
 }
 
 const google = createGoogleGenerativeAI({
@@ -17,6 +24,6 @@ export const system =`
 
 export const modelConfig = {
   // model: google("gemini-3.1-flash-lite"),
-  model: google("gemini-2.5-flash"),
+  model: google(GOOGLE_API_MODEL),
   system,
 }
