@@ -1,5 +1,7 @@
 # Kojiro AI Assistant
 
+https://github.com/user-attachments/assets/3b95a2c0-5f62-42a8-affc-4765e615b5b8
+
 Este projeto é um bot financeiro pessoal que registra gastos e receitas em uma base de dados. O objetivo é permitir que você escreva mensagens naturais como "acabei de comprar um lanche e custou 15 reais" e deixe o bot extrair automaticamente os dados financeiros.
 
 ## O que ele faz
